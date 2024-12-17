@@ -1,0 +1,55 @@
+module alchitry_top (
+    input clk,              // 100MHz clock
+    input rst_n,            // reset button (active low)
+    output led[8],          // 8 user controllable LEDs
+    input usb_rx,           // USB->Serial input
+    output usb_tx,          // USB->Serial output
+    output io_led[3][8],    // LEDs on IO Shield
+    output io_segment[8],   // 7-segment LEDs on IO Shield
+    output io_select[4],    // Digit select on IO Shield
+    input io_button[5],     // 5 buttons on IO Shield
+    input io_dip[3][8]      // DIP switches on IO Shield
+) {
+    
+    sig rst                 // reset signal
+    const CLOCK_DIVIDER = $is_sim() ? 8 : 26
+    
+    .clk(clk) {
+        // The reset conditioner is used to synchronize the reset signal to the FPGA
+        // clock. This ensures the entire FPGA comes out of reset at the same time.
+        reset_conditioner reset_cond
+        .rst(rst){
+            counter slow_clk(#SIZE(1), #DIV(CLOCK_DIVIDER))
+        }
+    }
+    
+    // directly connect the outlets in declaration
+    counter values_clk_sc (#SIZE(3),.rst(rst), .clk(slow_clk.value))
+    counter values_clk_o(#SIZE(3), #DIV(CLOCK_DIVIDER+1), .rst(rst), .clk(clk))
+    
+    bin_to_dec bin_to_dec(#DIGITS(1))
+    seven_segment_encoder seven_segment_encoder(.char(bin_to_dec.digits[0]));
+    
+     
+   
+    always {
+        reset_cond.in = ~rst_n  // input raw inverted reset signal
+        rst = reset_cond.out    // conditioned reset
+        
+        led = 8h00              // turn LEDs off
+        
+        usb_tx = usb_rx         // loop serial port
+        
+        if (io_dip[0][0]){
+            bin_to_dec.value = values_clk_sc.value
+        }
+        else{
+            bin_to_dec.value = values_clk_o.value
+        }
+        
+        io_led[2:1] = 2x{{8h00}} // turn off 2 sets of io_led
+        io_led[0] = bin_to_dec.digits[0] // make io_led[0] reflect digits
+        io_segment = ~seven_segment_encoder.segs
+        io_select = 4hE
+    }
+}

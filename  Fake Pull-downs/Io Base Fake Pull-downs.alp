@@ -1,0 +1,55 @@
+{
+    "template": {
+        "name": "Io Base Fake Pull-downs",
+        "description": "Minimum boilerplate project for the Io element using fake pull-downs",
+        "boards": ["Cu"],
+        "priority": 5
+    },
+    "project": {
+        "type": "V1.2",
+        "projectName": "Io Base",
+        "board": "Alchitry Cu",
+        "sourceFiles": [
+            {
+                "file": {
+                    "type": "DiskFile",
+                    "path": "source/alchitry_top.luc"
+                },
+                "top": true
+            },
+            {
+                "file": {
+                    "type": "Component",
+                    "path": "Conditioning/reset_conditioner.luc"
+                }
+            },
+            {
+                "file": {
+                    "type": "Component",
+                    "path": "Miscellaneous/fake_pull_down_2d.luc"
+                }
+            },
+            {
+                "file": {
+                    "type": "Component",
+                    "path": "Miscellaneous/fake_pull_down.luc"
+                }
+            }
+        ],
+        "constraintFiles": [
+            {
+                "file": {
+                    "type": "Component",
+                    "path": "Constraints/alchitry.acf"
+                }
+            },
+            {
+                "file": {
+                    "type": "Component",
+                    "path": "Constraints/io.acf"
+                }
+            }
+        ],
+        "ipCores": []
+    }
+}
