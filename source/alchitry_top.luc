@@ -12,7 +12,9 @@ module alchitry_top (
 ) {
     
     sig rst                 // reset signal
-    const CLOCK_DIVIDER = $is_sim() ? 8 : 26
+    const CLOCK_DIVIDER = $is_sim() ? 9 : 26
+    const CLK_FREQ = $is_sim() ? 1000 : 100000000
+    const INITIAL_COUNTDOWN_VALUE = 7
     
     .clk(clk) {
         // The reset conditioner is used to synchronize the reset signal to the FPGA
@@ -23,15 +25,12 @@ module alchitry_top (
         }
     }
     
-    // directly connect the outlets in declaration
-    counter values_clk_sc (#SIZE(3),.rst(rst), .clk(slow_clk.value))
-    counter values_clk_o(#SIZE(3), #DIV(CLOCK_DIVIDER+1), .rst(rst), .clk(clk))
+    custom_countdown countdown(#INITIAL_VALUE(INITIAL_COUNTDOWN_VALUE), .rst(rst), .clk(slow_clk.value))
     
     bin_to_dec bin_to_dec(#DIGITS(1))
     seven_segment_encoder seven_segment_encoder(.char(bin_to_dec.digits[0]));
-    
-     
    
+    
     always {
         reset_cond.in = ~rst_n  // input raw inverted reset signal
         rst = reset_cond.out    // conditioned reset
@@ -40,16 +39,13 @@ module alchitry_top (
         
         usb_tx = usb_rx         // loop serial port
         
-        if (io_dip[0][0]){
-            bin_to_dec.value = values_clk_sc.value
-        }
-        else{
-            bin_to_dec.value = values_clk_o.value
-        }
+        bin_to_dec.value = countdown.out
         
         io_led[2:1] = 2x{{8h00}} // turn off 2 sets of io_led
         io_led[0] = bin_to_dec.digits[0] // make io_led[0] reflect digits
         io_segment = ~seven_segment_encoder.segs
         io_select = 4hE
+        
+        
     }
 }

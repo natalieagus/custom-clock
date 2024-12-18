@@ -1,0 +1,25 @@
+module custom_countdown#(
+    INITIAL_VALUE = 7 : INITIAL_VALUE > 0
+) (
+    input clk,  // clock
+    input rst,  // reset
+    output out[$clog2(INITIAL_VALUE)]
+) {
+
+    dff value[$clog2(INITIAL_VALUE)](#INIT(INITIAL_VALUE), .clk(clk), .rst(rst))
+    
+    always {
+        
+        value.d = value.q - 1
+        
+        if (~|value.q){
+            value.d = 7
+        }
+        
+        out = value.q
+        
+        if (rst){
+            value.d = 0
+        }
+    }
+}

@@ -37,8 +37,20 @@
             },
             {
                 "file": {
+                    "type": "DiskFile",
+                    "path": "source/custom_countdown.luc"
+                }
+            },
+            {
+                "file": {
                     "type": "Component",
-                    "path": "Miscellaneous/decoder.luc"
+                    "path": "Miscellaneous/pipeline.luc"
+                }
+            },
+            {
+                "file": {
+                    "type": "Component",
+                    "path": "Conditioning/button_conditioner.luc"
                 }
             }
         ],
