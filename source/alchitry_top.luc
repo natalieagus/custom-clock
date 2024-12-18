@@ -20,16 +20,18 @@ module alchitry_top (
         // The reset conditioner is used to synchronize the reset signal to the FPGA
         // clock. This ensures the entire FPGA comes out of reset at the same time.
         reset_conditioner reset_cond
+        button_conditioner io_button_0(#CLK_FREQ(CLK_FREQ), .in(io_button[0]))
         .rst(rst){
             counter slow_clk(#SIZE(1), #DIV(CLOCK_DIVIDER))
         }
     }
     
-    custom_countdown countdown(#INITIAL_VALUE(INITIAL_COUNTDOWN_VALUE), .rst(rst), .clk(slow_clk.value))
+    custom_countdown countdown(#INITIAL_VALUE(INITIAL_COUNTDOWN_VALUE), .rst(io_button_0.out), .clk(slow_clk.value))
     
     bin_to_dec bin_to_dec(#DIGITS(1))
     seven_segment_encoder seven_segment_encoder(.char(bin_to_dec.digits[0]));
    
+
     
     always {
         reset_cond.in = ~rst_n  // input raw inverted reset signal
