@@ -1,0 +1,26 @@
+module custom_countdown_v2#(
+    INITIAL_VALUE = 7 : INITIAL_VALUE > 0
+) (
+    input clk,  // clock
+    input rst,  // reset
+    input slow_clk,
+    output out[$clog2(INITIAL_VALUE)]
+) {
+    
+    edge_detector slow_clock_edge(#RISE(1), #FALL(0), .clk(clk), .in(slow_clk))
+    dff value[$clog2(INITIAL_VALUE)](#INIT(INITIAL_VALUE), .clk(clk), .rst(rst))
+    
+    always {
+        
+        // if(slow_clk){     // this is the wrong approach
+        if (slow_clock_edge.out){
+            value.d = value.q - 1
+        }
+        
+        if (~|value.q){
+            value.d = 7
+        }
+        
+        out = value.q
+    }
+}

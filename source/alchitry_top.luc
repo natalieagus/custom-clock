@@ -27,11 +27,11 @@ module alchitry_top (
     }
     
     custom_countdown countdown(#INITIAL_VALUE(INITIAL_COUNTDOWN_VALUE), .rst(io_button_0.out), .clk(slow_clk.value))
+    custom_countdown_v2 countdown_v2(#INITIAL_VALUE(INITIAL_COUNTDOWN_VALUE), .rst(rst), .clk(clk), .slow_clk(slow_clk.value))
     
     bin_to_dec bin_to_dec(#DIGITS(1))
     seven_segment_encoder seven_segment_encoder(.char(bin_to_dec.digits[0]));
-   
-
+  
     
     always {
         reset_cond.in = ~rst_n  // input raw inverted reset signal
@@ -41,7 +41,13 @@ module alchitry_top (
         
         usb_tx = usb_rx         // loop serial port
         
-        bin_to_dec.value = countdown.out
+        if (io_dip[0][0]){
+            bin_to_dec.value = countdown_v2.out
+        }
+        else{
+            bin_to_dec.value = countdown.out
+        }
+        
         
         io_led[2:1] = 2x{{8h00}} // turn off 2 sets of io_led
         io_led[0] = bin_to_dec.digits[0] // make io_led[0] reflect digits
