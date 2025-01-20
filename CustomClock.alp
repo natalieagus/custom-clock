@@ -1,6 +1,6 @@
 {
     "project": {
-        "type": "V1.2",
+        "type": "V1.3",
         "projectName": "CustomClock",
         "board": "Alchitry Au",
         "sourceFiles": [
@@ -76,7 +76,7 @@
             {
                 "file": {
                     "type": "Component",
-                    "path": "Constraints/io.acf"
+                    "path": "Constraints/io_v1_pulldown.acf"
                 }
             }
         ],
